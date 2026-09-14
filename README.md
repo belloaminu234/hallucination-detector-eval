@@ -1,6 +1,6 @@
 # hallucination-detector-eval
 
-A specialized evaluator that scans agent output (code, API calls, prose) for references to API endpoints, parameters, and ID strings, and flags any that don't actually exist in a supplied ground-truth API spec — a common and hard-to-catch failure mode where an LLM confidently invents a plausible-looking `/v2/users/{id}/deactivate` endpoint, a `discount_code` parameter, or an object ID that was never returned by anything. Built entirely on the Python standard library.
+A specialized evaluator that scans agent output (code, API calls, prose) for references to API endpoints, parameters, and ID strings, and flags any that don't actually exist in a supplied ground-truth API spec. A common and hard-to-catch failure mode where an LLM confidently invents a plausible-looking `/v2/users/{id}/deactivate` endpoint, a `discount_code` parameter, or an object ID that was never returned by anything. Built entirely on the Python standard library.
 
 ## What it does
 
@@ -93,7 +93,7 @@ Also manually smoke-tested against realistic agent-output snippets (see the exam
 
 ## Limitations
 
-- Regex-based static extraction, not a real parser — favors precision over recall by design. Unusual formatting, multi-line calls, or nested parentheses may cause a claim to be missed entirely rather than mis-extracted.
+- Regex-based static extraction, not a real parser, favors precision over recall by design. Unusual formatting, multi-line calls, or nested parentheses may cause a claim to be missed entirely rather than mis-extracted.
 - Parameter validity is checked against the whole API's vocabulary, not per-endpoint (see "Design notes").
 - The ID pattern is tuned for the common `prefix_alphanumericwithdigits` shape (Stripe/Linear-style). Purely numeric IDs, UUIDs, or a different house style would need a different pattern.
 - No understanding of variables/data flow — `path = "/users/" + user_id; requests.get(path)` won't be recognized as an endpoint claim, since the literal path isn't in the call itself.
