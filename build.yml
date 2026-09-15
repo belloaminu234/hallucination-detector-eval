@@ -1,0 +1,32 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # pyproject.toml declares `requires-python = ">=3.10"` -- testing
+        # against an older interpreter here would fail at the `pip
+        # install` step (pip refuses to install a package whose declared
+        # Python requirement excludes the running interpreter), which is
+        # what cancelled the previous run's sibling jobs. Keep this
+        # matrix in sync with pyproject.toml's requires-python.
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package
+        run: pip install -e .
+
+      - name: Run tests
+        run: python -m unittest discover tests -v
